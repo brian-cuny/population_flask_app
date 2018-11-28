@@ -50,7 +50,7 @@ with app.app_context():
         next(file)
         for row in csv.reader(file):
             try:
-                m = Metros(id=int(row[0]), metro=row[1])
+                m = Metros(id=int(row[0]), metro=row[1], latitude=float(row[2]), longitude=float(row[3]))
                 db.session.add(m)
                 db.session.commit()
             except Exception as e:

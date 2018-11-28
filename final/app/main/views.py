@@ -19,7 +19,7 @@ def index():
 def metro():
     metros = map(int, re.findall('\d+', request.args.get('metros')))
 
-    query = db.session.query(Metros.id, Metros.metro, Populations.year, func.sum(Populations.population).label('population'))\
+    query = db.session.query(Metros.id, Metros.metro, Populations.year, func.sum(Populations.population).label('population'), Metros.latitude, Metros.longitude)\
         .join(Metros_Counties)\
         .join(Counties)\
         .join(Populations)\
@@ -38,8 +38,10 @@ def metro():
         .all()
 
     to_ret = dict()
-    to_ret['circle'] = [{'sort_by': str(i[1])+'-'+i[4].strftime('%Y'), 'population': i[3], 'county': i[0], 'metro': i[2], 'year': i[4].strftime("%Y")}
+    to_ret['circle'] = [{'sort_by': str(i[1])+'-'+i[4].strftime('%Y'), 'population': i[3], 'county': i[0],
+                         'metro': i[2], 'year': i[4].strftime("%Y")}
                              for i in counties ]
-    to_ret['line'] = [{'sort_by': i[1], 'population': int(i[3]), 'year': i[2].strftime('%Y')} for i in query]
+    to_ret['line'] = [{'sort_by': i[1], 'population': int(i[3]), 'year': i[2].strftime('%Y'),
+                       'lat': i[4], 'lon': i[5]} for i in query]
     return jsonify(to_ret)
 

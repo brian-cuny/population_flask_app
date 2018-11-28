@@ -41,6 +41,7 @@
 
     //AJAX Query
     $submit.on('click', function(e){
+        NProgress.start();
        e.preventDefault();
        $.ajax({
             type: 'GET',
@@ -50,7 +51,9 @@
             success: function(input){
                 displayPlot(input['line']);
                 displayCircle(input['circle']);
+                displayMap(input['line']);
                 $('#year-slider').slider('enable');
+                NProgress.done();
             }
         });
     });
@@ -66,6 +69,55 @@
             }
         }
     });
+
+    function displayMap(input){
+        mapData = _.groupBy(input, 'sort_by');
+        let lat = [];
+        let lon = [];
+        let size = [];
+        let name = [];
+        for(let ele in mapData){
+            lat.push(mapData[ele][0]['lat']);
+            lon.push(mapData[ele][0]['lon']);
+            size.push(Math.log(mapData[ele][0]['population']));
+            name.push(ele + ' ' + mapData[ele][0]['population'].toLocaleString());
+        }
+
+        let data =[{
+            type:'scattergeo',
+            locationmode: 'USA-states',
+            lat: lat,
+            lon: lon,
+            hoverinfo: 'text',
+            text: name,
+            marker: {
+                size: size,
+                line: {
+                    color: 'black',
+                    width: 2
+                }
+            }
+        }];
+
+        let layout = {
+            title: '',
+            showlegend: false,
+            geo: {
+                scope: 'usa',
+                projection: {
+                    type: 'albers usa'
+                },
+                showland: true,
+                landcolor: 'rgb(217, 217, 217)',
+                subunitwidth: 1,
+                countrywidth: 1,
+                subunitcolor: 'rgb(255,255,255)',
+                countrycolor: 'rgb(255,255,255)'
+            },
+        };
+
+        Plotly.newPlot(document.getElementById('map'), data, layout, {showLink: false});
+    }
 
     function displayCircle(input){
         let $circlePlots = $('#circle-plots').find('>:first-child');

@@ -37,9 +37,11 @@ class Metros(db.Model):
     __tablename__ = 'metros'
     id = db.Column(db.INTEGER, primary_key=True)
     metro = db.Column(db.String(100), unique=True)
+    latitude = db.Column(db.FLOAT)
+    longitude = db.Column(db.FLOAT)
 
     def __str__(self):
-        return f'Metros(id={self.id}, metro={self.metro})'
+        return f'Metros(id={self.id}, metro={self.metro}, lat={self.latitude}, lon={self.longitude})'
 
     def __repr__(self):
         return self.__str__()
